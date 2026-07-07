@@ -14,11 +14,12 @@ const waterTracker = {};
 router.get('/', protect, async (req, res) => {
   try {
     let plans = [];
+    const userId = getIsConnected() ? req.user._id : req.user.id;
 
     if (getIsConnected()) {
-      plans = await MealPlan.find({ userId: req.user.id });
+      plans = await MealPlan.find({ userId });
     } else {
-      plans = localMealPlans.filter(p => p.userId === req.user.id);
+      plans = localMealPlans.filter(p => p.userId === userId);
     }
 
     // Aggregate stats by date (last 7 days)
@@ -64,7 +65,7 @@ router.get('/', protect, async (req, res) => {
     };
 
     // Retrieve water intake
-    const waterKey = `${req.user.id}_${todayStr}`;
+    const waterKey = `${userId}_${todayStr}`;
     const waterCups = waterTracker[waterKey] || 0;
 
     return res.json({
@@ -89,7 +90,8 @@ router.post('/water', protect, async (req, res) => {
 
   try {
     const todayStr = new Date().toDateString();
-    const waterKey = `${req.user.id}_${todayStr}`;
+    const userId = getIsConnected() ? req.user._id : req.user.id;
+    const waterKey = `${userId}_${todayStr}`;
 
     waterTracker[waterKey] = (waterTracker[waterKey] || 0) + amount;
 

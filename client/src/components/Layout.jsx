@@ -15,10 +15,12 @@ const Layout = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Top Navbar */}
-      <Navbar />
+      <div className="print:hidden">
+        <Navbar />
+      </div>
 
       {/* Main Page Area with framer-motion transitions */}
-      <main className="flex-grow pt-24 pb-12 px-4 max-w-7xl mx-auto w-full">
+      <main className="flex-grow pt-24 pb-12 print:pt-0 print:pb-0 px-4 max-w-7xl mx-auto w-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -34,7 +36,9 @@ const Layout = () => {
       </main>
 
       {/* Reusable Footer */}
-      <Footer />
+      <div className="print:hidden">
+        <Footer />
+      </div>
     </div>
   );
 };

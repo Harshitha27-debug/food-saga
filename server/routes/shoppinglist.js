@@ -4,17 +4,25 @@ const ShoppingList = require('../models/ShoppingList');
 const Recipe = require('../models/Recipe');
 const { getIsConnected } = require('../config/db');
 const { protect } = require('../middleware/auth');
-const { mockRecipes, mockShoppingLists } = require('../utils/mockData');
+const { getMealById } = require('../utils/mealDB');
 
 // Local mock storage for demo mode
-let localShoppingList = { ...mockShoppingLists };
+let localShoppingList = { items: [] };
 
-// Helper to find a recipe details (mock or db)
+// Helper to check if an ID is a MongoDB ObjectId
+const isObjectId = (id) => {
+  return /^[0-9a-fA-F]{24}$/.test(id);
+};
+
+// Helper to find a recipe details (mock, db, or TheMealDB)
 const findRecipe = async (id) => {
-  if (getIsConnected()) {
-    return await Recipe.findById(id);
+  if (isObjectId(id)) {
+    if (getIsConnected()) {
+      return await Recipe.findById(id);
+    }
+    return null;
   } else {
-    return mockRecipes.find(r => r._id === id);
+    return await getMealById(id);
   }
 };
 
@@ -24,9 +32,9 @@ const findRecipe = async (id) => {
 router.get('/', protect, async (req, res) => {
   try {
     if (getIsConnected()) {
-      let list = await ShoppingList.findOne({ userId: req.user.id });
+      let list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) {
-        list = await ShoppingList.create({ userId: req.user.id, items: [] });
+        list = await ShoppingList.create({ userId: req.user._id, items: [] });
       }
       return res.json({ success: true, data: list });
     } else {
@@ -45,9 +53,9 @@ router.post('/', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      let list = await ShoppingList.findOne({ userId: req.user.id });
+      let list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) {
-        list = new ShoppingList({ userId: req.user.id, items: [] });
+        list = new ShoppingList({ userId: req.user._id, items: [] });
       }
 
       list.items.push({ name, amount, completed: false });
@@ -80,7 +88,7 @@ router.put('/item/:itemId', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      const list = await ShoppingList.findOne({ userId: req.user.id });
+      const list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) return res.status(404).json({ success: false, message: 'Shopping list not found' });
 
       const item = list.items.id(itemId);
@@ -116,7 +124,7 @@ router.delete('/item/:itemId', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      const list = await ShoppingList.findOne({ userId: req.user.id });
+      const list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) return res.status(404).json({ success: false, message: 'Shopping list not found' });
 
       list.items = list.items.filter(i => i._id.toString() !== itemId);
@@ -139,7 +147,7 @@ router.delete('/', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      const list = await ShoppingList.findOne({ userId: req.user.id });
+      const list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) return res.status(404).json({ success: false, message: 'Shopping list not found' });
 
       if (clearCompleted === 'true') {
@@ -191,14 +199,13 @@ router.post('/generate', protect, async (req, res) => {
     }
 
     if (getIsConnected()) {
-      let list = await ShoppingList.findOne({ userId: req.user.id });
+      let list = await ShoppingList.findOne({ userId: req.user._id });
       if (!list) {
-        list = new ShoppingList({ userId: req.user.id, items: [] });
+        list = new ShoppingList({ userId: req.user._id, items: [] });
       }
 
       // Add & merge items
       ingredientsToAdd.forEach(newItem => {
-        // If ingredient already exists (non-completed), combine amounts or append
         const existing = list.items.find(i => i.name.toLowerCase() === newItem.name.toLowerCase() && !i.completed);
         if (existing) {
           existing.amount = `${existing.amount} + ${newItem.amount}`;

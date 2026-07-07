@@ -4,10 +4,10 @@ const MealPlan = require('../models/MealPlan');
 const Recipe = require('../models/Recipe');
 const { getIsConnected } = require('../config/db');
 const { protect } = require('../middleware/auth');
-const { mockRecipes, mockMealPlans } = require('../utils/mockData');
+const { searchMeals } = require('../utils/mealDB');
 
 // Local in-memory list for demo mode meal plans
-const localMealPlans = [...mockMealPlans];
+const localMealPlans = [];
 
 // @route   GET /api/mealplans
 // @desc    Get user meal plans
@@ -17,7 +17,7 @@ router.get('/', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      const query = { userId: req.user.id };
+      const query = { userId: req.user._id };
 
       if (startDate && endDate) {
         query.date = {
@@ -58,7 +58,7 @@ router.post('/', protect, async (req, res) => {
   try {
     if (getIsConnected()) {
       const mealPlan = await MealPlan.create({
-        userId: req.user.id,
+        userId: req.user._id,
         date: new Date(date),
         mealType,
         recipeId,
@@ -100,7 +100,7 @@ router.post('/', protect, async (req, res) => {
 router.delete('/:id', protect, async (req, res) => {
   try {
     if (getIsConnected()) {
-      const mealPlan = await MealPlan.findOneAndDelete({ _id: req.params.id, userId: req.user.id });
+      const mealPlan = await MealPlan.findOneAndDelete({ _id: req.params.id, userId: req.user._id });
       if (!mealPlan) {
         return res.status(404).json({ success: false, message: 'Meal plan entry not found' });
       }
@@ -120,16 +120,16 @@ router.delete('/:id', protect, async (req, res) => {
 });
 
 // @route   GET /api/mealplans/suggestions
-// @desc    Get automated meal suggestions based on current date
+// @desc    Get automated meal suggestions based on current date (Real Recipes)
 // @access  Private
 router.get('/suggestions', protect, async (req, res) => {
   try {
-    const list = getIsConnected() ? await Recipe.find({}).limit(10) : mockRecipes;
+    const list = await searchMeals('c'); // Fetch dynamic common meals as suggestions!
     
-    // Choose random recipes for Breakfast, Lunch, and Dinner suggestions
-    const breakfast = list.filter(r => r.category.toLowerCase() === 'breakfast' || r.cookingTime <= 15)[0] || list[0];
-    const lunch = list.filter(r => r.category.toLowerCase() !== 'breakfast')[1] || list[1] || list[0];
-    const dinner = list.filter(r => r.category.toLowerCase() !== 'breakfast')[2] || list[2] || list[0];
+    // Choose recipes for Breakfast, Lunch, and Dinner suggestions
+    const breakfast = list[0] || null;
+    const lunch = list[1] || null;
+    const dinner = list[2] || null;
 
     return res.json({
       success: true,

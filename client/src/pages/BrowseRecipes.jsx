@@ -30,6 +30,7 @@ const BrowseRecipes = () => {
   // Suggestions auto-complete list
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [recentSearches, setRecentSearches] = useState(() => JSON.parse(localStorage.getItem('recentSearches') || '[]'));
 
   // Custom Recipe Modal State
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -92,20 +93,34 @@ const BrowseRecipes = () => {
       .finally(() => setLoading(false));
   };
 
-  // Autocomplete auto suggest trigger
+  // Autocomplete auto suggest trigger (debounced)
   useEffect(() => {
-    if (search.trim().length > 1) {
-      fetch(`/api/recipes?limit=5&search=${encodeURIComponent(search.trim())}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            setSuggestions(data.data.map(r => r.title));
-          }
-        });
-    } else {
-      setSuggestions([]);
-    }
+    const delayDebounce = setTimeout(() => {
+      if (search.trim().length > 1) {
+        fetch(`/api/recipes?limit=5&search=${encodeURIComponent(search.trim())}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              setSuggestions(data.data.map(r => r.title));
+            }
+          });
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
   }, [search]);
+
+  const saveToRecentSearches = (term) => {
+    if (!term || !term.trim()) return;
+    const t = term.trim();
+    setRecentSearches(prev => {
+      const updated = [t, ...prev.filter(s => s !== t)].slice(0, 5);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
+      return updated;
+    });
+  };
 
   const handleApplyFilters = () => {
     setShowFilters(false);
@@ -231,8 +246,16 @@ const BrowseRecipes = () => {
               type="text" 
               placeholder="Search by title, ingredient..."
               value={search}
+              onFocus={() => setShowSuggestions(true)}
               onChange={(e) => { setSearch(e.target.value); setShowSuggestions(true); }}
               onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  saveToRecentSearches(search);
+                  fetchRecipes(search, category, cuisine, sort, diet, 1);
+                  setShowSuggestions(false);
+                }
+              }}
               className="bg-transparent focus:outline-none w-full ml-2 text-sm text-slate-850 dark:text-slate-100"
             />
             {search && (
@@ -242,21 +265,45 @@ const BrowseRecipes = () => {
             )}
           </div>
 
-          {/* Suggestions Dropdown */}
-          {showSuggestions && suggestions.length > 0 && (
-            <div className="absolute top-12 left-0 right-0 glass rounded-xl shadow-premium p-2 z-30 flex flex-col gap-1 border border-slate-200/50">
-              {suggestions.map((sug, i) => (
-                <button
-                  key={i}
-                  onMouseDown={() => {
-                    setSearch(sug);
-                    fetchRecipes(sug, category, cuisine, sort, diet, 1);
-                  }}
-                  className="w-full text-left p-2 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs rounded-lg truncate text-slate-700 dark:text-slate-350"
-                >
-                  🔍 {sug}
-                </button>
-              ))}
+          {/* Suggestions Dropdown (with Recent Searches support) */}
+          {showSuggestions && (
+            <div className="absolute top-12 left-0 right-0 glass rounded-xl shadow-premium p-2.5 z-30 flex flex-col gap-1 border border-slate-200/50">
+              {suggestions.length > 0 ? (
+                <>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 px-2">Suggestions</p>
+                  {suggestions.map((sug, i) => (
+                    <button
+                      key={i}
+                      onMouseDown={() => {
+                        setSearch(sug);
+                        saveToRecentSearches(sug);
+                        fetchRecipes(sug, category, cuisine, sort, diet, 1);
+                      }}
+                      className="w-full text-left p-2 hover:bg-slate-105 dark:hover:bg-slate-800 text-xs rounded-lg truncate text-slate-700 dark:text-slate-300"
+                    >
+                      🔍 {sug}
+                    </button>
+                  ))}
+                </>
+              ) : recentSearches.length > 0 && !search ? (
+                <>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1 px-2">Recent Searches</p>
+                  {recentSearches.map((sug, i) => (
+                    <button
+                      key={i}
+                      onMouseDown={() => {
+                        setSearch(sug);
+                        fetchRecipes(sug, category, cuisine, sort, diet, 1);
+                      }}
+                      className="w-full text-left p-2 hover:bg-slate-105 dark:hover:bg-slate-800 text-xs rounded-lg truncate text-slate-650 dark:text-slate-400"
+                    >
+                      ⏳ {sug}
+                    </button>
+                  ))}
+                </>
+              ) : (
+                <p className="text-[10px] text-slate-400 text-center py-2 italic font-semibold">Type to search recipes...</p>
+              )}
             </div>
           )}
         </div>
@@ -384,6 +431,7 @@ const BrowseRecipes = () => {
                   <img 
                     src={recipe.image || 'https://images.unsplash.com/photo-1495521821757-a1efb6729352?auto=format&fit=crop&w=800&q=80'} 
                     alt={recipe.title} 
+                    loading="lazy"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
                   />
                   <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/60 backdrop-blur-xs text-[10px] text-white font-bold">

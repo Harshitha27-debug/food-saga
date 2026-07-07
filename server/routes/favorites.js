@@ -13,7 +13,7 @@ const mockFavorites = [];
 router.get('/', protect, async (req, res) => {
   try {
     if (getIsConnected()) {
-      const favorites = await Favorite.find({ userId: req.user.id });
+      const favorites = await Favorite.find({ userId: req.user._id });
       return res.json({ success: true, data: favorites });
     } else {
       const userFavs = mockFavorites.filter(f => f.userId === req.user.id);
@@ -32,13 +32,13 @@ router.post('/', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      let favorite = await Favorite.findOne({ userId: req.user.id, recipeId });
+      let favorite = await Favorite.findOne({ userId: req.user._id, recipeId });
       if (favorite) {
         return res.status(400).json({ success: false, message: 'Already favorited' });
       }
 
       favorite = await Favorite.create({
-        userId: req.user.id,
+        userId: req.user._id,
         recipeId,
         recipeTitle,
         recipeImage,
@@ -80,7 +80,7 @@ router.delete('/:recipeId', protect, async (req, res) => {
 
   try {
     if (getIsConnected()) {
-      const favorite = await Favorite.findOneAndDelete({ userId: req.user.id, recipeId });
+      const favorite = await Favorite.findOneAndDelete({ userId: req.user._id, recipeId });
       if (!favorite) {
         return res.status(404).json({ success: false, message: 'Favorite not found' });
       }

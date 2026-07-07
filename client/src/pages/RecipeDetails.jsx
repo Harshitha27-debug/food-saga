@@ -5,7 +5,7 @@ import { usePlanner } from '../context/PlannerContext';
 import { 
   Clock, Award, Flame, Heart, 
   Calendar, Star, Send, Printer, Volume2, 
-  VolumeX, Play, Pause, RotateCcw, AlertTriangle, CheckSquare, Plus
+  VolumeX, Play, Pause, RotateCcw, AlertTriangle, CheckSquare, Plus, Share2
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
@@ -48,6 +48,15 @@ const RecipeDetails = () => {
     checkIfFavorited();
   }, [id]);
 
+  useEffect(() => {
+    if (recipe) {
+      const currentViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+      const item = { id: recipe._id, title: recipe.title, image: recipe.image };
+      const updated = [item, ...currentViewed.filter(v => v.id !== recipe._id)].slice(0, 5);
+      localStorage.setItem('recentlyViewed', JSON.stringify(updated));
+    }
+  }, [recipe]);
+
   const fetchRecipeData = () => {
     setLoading(true);
     fetch(`/api/recipes/${id}`)
@@ -84,6 +93,11 @@ const RecipeDetails = () => {
           setIsFav(favorited);
         }
       });
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    alert('Recipe link copied to clipboard!');
   };
 
   const handleFavoriteToggle = async () => {
@@ -306,7 +320,10 @@ const RecipeDetails = () => {
           <div className="flex flex-col gap-3">
             <div className="flex gap-2 flex-wrap">
               <span className="px-3 py-1 bg-brand rounded-full text-xs font-bold uppercase tracking-wider">{recipe.category}</span>
-              <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">{recipe.cuisine}</span>
+              <span className="px-3 py-1 bg-white/25 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider">{recipe.cuisine}</span>
+              {recipe.dietTags && recipe.dietTags.map((tag, idx) => (
+                <span key={idx} className="px-3 py-1 bg-emerald-500/30 backdrop-blur-md border border-emerald-500/20 text-emerald-100 rounded-full text-xs font-bold uppercase tracking-wider">{tag}</span>
+              ))}
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-black leading-tight max-w-2xl">{recipe.title}</h1>
             <p className="text-slate-350 text-sm max-w-xl line-clamp-2">{recipe.description}</p>
@@ -316,8 +333,16 @@ const RecipeDetails = () => {
             <button 
               onClick={handleFavoriteToggle}
               className={`p-3 rounded-2xl border transition-all ${isFav ? 'bg-brand border-brand text-white' : 'bg-white/10 border-white/25 hover:bg-white/20 text-white'}`}
+              title="Save to Favorites"
             >
               <Heart className={`w-5 h-5 ${isFav ? 'fill-white' : ''}`} />
+            </button>
+            <button 
+              onClick={handleShare}
+              className="p-3 rounded-2xl border border-white/25 bg-white/10 hover:bg-white/20 text-white transition-all"
+              title="Share Recipe Link"
+            >
+              <Share2 className="w-5 h-5" />
             </button>
             <button 
               onClick={() => setShowScheduleModal(true)}
@@ -594,7 +619,7 @@ const RecipeDetails = () => {
                 to={`/recipe/${recipe._id}`} 
                 className="group flex gap-4 p-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800/80 hover:shadow-premium hover:-translate-y-1 transition-all duration-350"
               >
-                <img src={recipe.image} alt={recipe.title} className="w-16 h-16 rounded-xl object-cover shrink-0" />
+                <img src={recipe.image} alt={recipe.title} loading="lazy" className="w-16 h-16 rounded-xl object-cover shrink-0" />
                 <div className="flex flex-col gap-1 min-w-0 justify-center">
                   <h4 className="font-display font-bold text-sm text-slate-800 dark:text-slate-100 truncate group-hover:text-brand transition-colors">{recipe.title}</h4>
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{recipe.cuisine} • {recipe.cookingTime} Mins</span>
