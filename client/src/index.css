@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans selection:bg-brand/20 selection:text-brand;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold tracking-tight;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 dark:bg-slate-900/60 backdrop-blur-lg border border-white/20 dark:border-slate-800/50 shadow-glass;
+  }
+  
+  .glass-premium {
+    @apply bg-gradient-to-br from-white/80 to-white/40 dark:from-slate-900/80 dark:to-slate-950/40 backdrop-blur-xl border border-white/30 dark:border-slate-800/40 shadow-premium;
+  }
+
+  .glass-card {
+    @apply bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border border-white/10 dark:border-slate-800/30 transition-all duration-300 hover:shadow-glass-hover hover:border-white/20 dark:hover:border-slate-700/40;
+  }
+
+  .bg-gradient-premium {
+    @apply bg-gradient-to-tr from-brand-light via-brand to-brand-dark;
+  }
+}
+
+/* Custom Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-300 dark:bg-slate-800 rounded-full hover:bg-slate-400 dark:hover:bg-slate-700 transition-colors;
+}
+
+/* Smooth active state highlights */
+.active-nav-item {
+  @apply text-brand font-semibold scale-105;
+}
+
+/* Loader Screen Animation */
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 12s linear infinite;
+}
