@@ -213,7 +213,7 @@ const BrowseRecipes = () => {
   };
 
   const cuisinesList = ['Italian', 'Indian', 'French', 'Mediterranean', 'American', 'Global'];
-  const categoriesList = ['Breakfast', 'Pasta', 'Salad', 'Curry', 'Seafood', 'Dessert', 'Main Course'];
+  const categoriesList = ['Breakfast', 'Chicken', 'Beef', 'Vegetarian', 'Pasta', 'Seafood', 'Dessert'];
   const dietsList = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Low-Carb', 'High-Protein'];
 
   return (

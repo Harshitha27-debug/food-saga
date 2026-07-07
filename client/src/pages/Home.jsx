@@ -19,7 +19,7 @@ const Home = () => {
 
   useEffect(() => {
     // Load recommendations/seasonal recipes
-    fetch('/api/recipes?limit=6')
+    fetch('/api/recipes?limit=25')
       .then(res => res.json())
       .then(d => {
         if (d.success) setRecipes(d.data);

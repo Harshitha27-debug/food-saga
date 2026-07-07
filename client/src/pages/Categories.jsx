@@ -6,8 +6,8 @@ const Categories = () => {
   const categoriesList = [
     { name: 'Breakfast', emoji: '🍳', count: 12, desc: 'Healthy starts, visual poached eggs, oats, and morning treats.', color: 'from-amber-400 to-orange-500' },
     { name: 'Pasta', emoji: '🍝', count: 8, desc: 'Classic Carbonara, creamy sauces, and authentic Italian dough.', color: 'from-red-400 to-rose-600' },
-    { name: 'Salad', emoji: '🥗', count: 14, desc: 'Crispy green Buddha bowls, roasted vegetables, and tahini.', color: 'from-green-400 to-emerald-600' },
-    { name: 'Curry', emoji: '🍛', count: 10, desc: 'Paneer tikka, spicy Indian masalas, and rich butter sauces.', color: 'from-yellow-400 to-amber-600' },
+    { name: 'Vegetarian', emoji: '🥗', count: 14, desc: 'Crispy green Buddha bowls, roasted vegetables, and tahini.', color: 'from-green-400 to-emerald-600' },
+    { name: 'Chicken', emoji: '🍗', count: 10, desc: 'Golden roasted drumsticks, seasoned curries, and spicy grills.', color: 'from-yellow-400 to-amber-600' },
     { name: 'Seafood', emoji: '🐟', count: 6, desc: 'Grilled salmon, snap-crisp asparagus, and lemon butter fillets.', color: 'from-blue-400 to-indigo-600' },
     { name: 'Dessert', emoji: '🍰', count: 9, desc: 'Gourmet sweet pies, dark chocolate soufflés, and light cakes.', color: 'from-purple-400 to-pink-600' }
   ];

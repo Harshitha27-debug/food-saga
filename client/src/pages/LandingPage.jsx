@@ -32,8 +32,8 @@ const LandingPage = () => {
   const categories = [
     { name: 'Breakfast', emoji: '🍳', color: 'from-amber-400 to-orange-500' },
     { name: 'Pasta', emoji: '🍝', color: 'from-red-400 to-rose-600' },
-    { name: 'Salad', emoji: '🥗', color: 'from-green-400 to-emerald-600' },
-    { name: 'Curry', emoji: '🍛', color: 'from-yellow-400 to-amber-600' },
+    { name: 'Vegetarian', emoji: '🥗', color: 'from-green-400 to-emerald-600' },
+    { name: 'Chicken', emoji: '🍗', color: 'from-yellow-400 to-amber-600' },
     { name: 'Seafood', emoji: '🐟', color: 'from-blue-400 to-indigo-600' }
   ];
 
