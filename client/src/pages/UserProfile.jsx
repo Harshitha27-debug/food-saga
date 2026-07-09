@@ -6,6 +6,8 @@ import {
   Edit, Save, ShieldAlert, Sparkles, Check, Heart, Eye, Search, Clock
 } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const UserProfile = () => {
   const { user, token, updateProfile } = useAuth();
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ const UserProfile = () => {
     }
 
     // 1. Fetch user favorites
-    fetch('/api/favorites', {
+    fetch(`${API_URL}/api/favorites`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -37,7 +39,7 @@ const UserProfile = () => {
       .catch(err => console.error('Error fetching profile favorites:', err));
 
     // 2. Fetch user meal plans
-    fetch('/api/mealplans', {
+    fetch(`${API_URL}/api/mealplans`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())

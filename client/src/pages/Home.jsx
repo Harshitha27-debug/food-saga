@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const Home = () => {
   const { user, incrementStreak } = useAuth();
   const { mealPlans, shoppingList, notifications } = usePlanner();
@@ -19,7 +21,7 @@ const Home = () => {
 
   useEffect(() => {
     // Load recommendations/seasonal recipes
-    fetch('/api/recipes?limit=25')
+    fetch(`${API_URL}/api/recipes?limit=25`)
       .then(res => res.json())
       .then(d => {
         if (d.success) setRecipes(d.data);

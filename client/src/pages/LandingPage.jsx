@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Flame, Award, Clock, ArrowRight, Star, Heart, CheckCircle } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const LandingPage = () => {
   const navigate = useNavigate();
   const [searchVal, setSearchVal] = useState('');
@@ -11,12 +13,12 @@ const LandingPage = () => {
 
   useEffect(() => {
     // Fetch recipe of the day and trending
-    fetch('/api/recipes/recipe-of-the-day')
+    fetch(`${API_URL}/api/recipes/recipe-of-the-day`)
       .then(res => res.json())
       .then(d => { if (d.success) setRecipeOfTheDay(d.data); })
       .catch(e => console.error(e));
 
-    fetch('/api/recipes/trending')
+    fetch(`${API_URL}/api/recipes/trending`)
       .then(res => res.json())
       .then(d => { if (d.success) setTrending(d.data); })
       .catch(e => console.error(e));

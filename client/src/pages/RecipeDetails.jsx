@@ -9,6 +9,8 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const RecipeDetails = () => {
   const { id } = useParams();
   const { user, token } = useAuth();
@@ -59,13 +61,13 @@ const RecipeDetails = () => {
 
   const fetchRecipeData = () => {
     setLoading(true);
-    fetch(`/api/recipes/${id}`)
+    fetch(`${API_URL}/api/recipes/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setRecipe(data.data);
           // Fetch similar recipes
-          fetch(`/api/recipes?limit=3&category=${encodeURIComponent(data.data.category)}`)
+          fetch(`${API_URL}/api/recipes?limit=3&category=${encodeURIComponent(data.data.category)}`)
             .then(res => res.json())
             .then(simData => {
               if (simData.success) {
@@ -83,7 +85,7 @@ const RecipeDetails = () => {
 
   const checkIfFavorited = () => {
     if (!token) return;
-    fetch('/api/favorites', {
+    fetch(`${API_URL}/api/favorites`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -107,7 +109,7 @@ const RecipeDetails = () => {
     }
 
     const method = isFav ? 'DELETE' : 'POST';
-    const url = isFav ? `/api/favorites/${id}` : '/api/favorites';
+    const url = isFav ? `${API_URL}/api/favorites/${id}` : `${API_URL}/api/favorites`;
     const body = isFav ? null : JSON.stringify({
       recipeId: recipe._id,
       recipeTitle: recipe.title,
@@ -254,7 +256,7 @@ const RecipeDetails = () => {
     }
 
     try {
-      const res = await fetch(`/api/recipes/${recipe._id}/reviews`, {
+      const res = await fetch(`${API_URL}/api/recipes/${recipe._id}/reviews`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -282,7 +284,7 @@ const RecipeDetails = () => {
     }
 
     try {
-      const res = await fetch(`/api/recipes/${recipe._id}/comments`, {
+      const res = await fetch(`${API_URL}/api/recipes/${recipe._id}/comments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

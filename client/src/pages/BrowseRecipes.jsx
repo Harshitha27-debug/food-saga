@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const BrowseRecipes = () => {
   const { user, token } = useAuth();
   const location = useLocation();
@@ -71,7 +73,7 @@ const BrowseRecipes = () => {
 
   const fetchRecipes = (s, cat, cuis, sortVal, dietVal, pageNum) => {
     setLoading(true);
-    let url = `/api/recipes?page=${pageNum}&limit=9`;
+    let url = `${API_URL}/api/recipes?page=${pageNum}&limit=9`;
     if (s) url += `&search=${encodeURIComponent(s)}`;
     if (cat) url += `&category=${encodeURIComponent(cat)}`;
     if (cuis) url += `&cuisine=${encodeURIComponent(cuis)}`;
@@ -97,7 +99,7 @@ const BrowseRecipes = () => {
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (search.trim().length > 1) {
-        fetch(`/api/recipes?limit=5&search=${encodeURIComponent(search.trim())}`)
+        fetch(`${API_URL}/api/recipes?limit=5&search=${encodeURIComponent(search.trim())}`)
           .then(res => res.json())
           .then(data => {
             if (data.success) {
@@ -181,7 +183,7 @@ const BrowseRecipes = () => {
     };
 
     try {
-      const res = await fetch('/api/recipes', {
+      const res = await fetch(`${API_URL}/api/recipes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

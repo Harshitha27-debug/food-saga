@@ -16,6 +16,8 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const NutritionDashboard = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -42,7 +44,7 @@ const NutritionDashboard = () => {
 
   const fetchNutritionStats = () => {
     setLoading(true);
-    fetch('/api/nutrition', {
+    fetch(`${API_URL}/api/nutrition`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -58,7 +60,7 @@ const NutritionDashboard = () => {
 
   const handleLogWater = async (amount) => {
     try {
-      const res = await fetch('/api/nutrition/water', {
+      const res = await fetch(`${API_URL}/api/nutrition/water`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -81,7 +83,7 @@ const NutritionDashboard = () => {
 
     setBmiLoading(true);
     try {
-      const res = await fetch('/api/nutrition/bmi', {
+      const res = await fetch(`${API_URL}/api/nutrition/bmi`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ weight: parseFloat(weight), height: parseFloat(height) })

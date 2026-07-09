@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const MealPlanner = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ const MealPlanner = () => {
   };
 
   const fetchSuggestions = () => {
-    fetch('/api/mealplans/suggestions', {
+    fetch(`${API_URL}/api/mealplans/suggestions`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())

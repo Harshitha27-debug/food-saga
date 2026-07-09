@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 import { useAuth } from './AuthContext';
 
 const PlannerContext = createContext();
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export const PlannerProvider = ({ children }) => {
   const { token, user } = useAuth();
@@ -18,7 +19,8 @@ export const PlannerProvider = ({ children }) => {
       'Content-Type': 'application/json',
       ...options.headers
     };
-    const response = await fetch(url, { ...options, headers });
+    const targetUrl = url.startsWith('http') ? url : `${API_URL}${url}`;
+    const response = await fetch(targetUrl, { ...options, headers });
     return await response.json();
   };
 

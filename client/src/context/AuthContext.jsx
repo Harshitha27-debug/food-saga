@@ -10,6 +10,7 @@ import {
 import { onAuthStateChanged, updateProfile as firebaseUpdateProfile } from 'firebase/auth';
 
 const AuthContext = createContext();
+const API_URL = import.meta.env.VITE_API_URL || '';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }) => {
           setToken(idToken);
           
           // Sync with MongoDB backend profile
-          const res = await fetch('/api/auth/me', {
+          const res = await fetch(`${API_URL}/api/auth/me`, {
             headers: {
               'Authorization': `Bearer ${idToken}`
             }
@@ -44,7 +45,7 @@ export const AuthProvider = ({ children }) => {
         if (storedToken && storedToken.split('.').length === 3) {
           // It's a custom JWT token from our database fallback. Let's validate it.
           try {
-            const res = await fetch('/api/auth/me', {
+            const res = await fetch(`${API_URL}/api/auth/me`, {
               headers: { 'Authorization': `Bearer ${storedToken}` }
             });
             const data = await res.json();
@@ -83,7 +84,7 @@ export const AuthProvider = ({ children }) => {
         const idToken = await userCred.user.getIdToken();
         
         // Sync user creation with backend database
-        const res = await fetch('/api/auth/signup', {
+        const res = await fetch(`${API_URL}/api/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password })
@@ -103,7 +104,7 @@ export const AuthProvider = ({ children }) => {
 
     // Server Fallback
     try {
-      const res = await fetch('/api/auth/signup', {
+      const res = await fetch(`${API_URL}/api/auth/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })
@@ -129,7 +130,7 @@ export const AuthProvider = ({ children }) => {
         const idToken = await userCred.user.getIdToken();
         
         // Load MongoDB Profile details
-        const res = await fetch('/api/auth/me', {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
           headers: { 'Authorization': `Bearer ${idToken}` }
         });
         const data = await res.json();
@@ -147,7 +148,7 @@ export const AuthProvider = ({ children }) => {
 
     // Server Fallback
     try {
-      const res = await fetch('/api/auth/login', {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -173,7 +174,7 @@ export const AuthProvider = ({ children }) => {
         const idToken = await userCred.user.getIdToken();
         
         // Sync with server DB
-        const res = await fetch('/api/auth/google', {
+        const res = await fetch(`${API_URL}/api/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -197,7 +198,7 @@ export const AuthProvider = ({ children }) => {
 
     // Fast-pass fallback
     try {
-      const res = await fetch('/api/auth/google', {
+      const res = await fetch(`${API_URL}/api/auth/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -234,7 +235,7 @@ export const AuthProvider = ({ children }) => {
   // Update profile
   const updateProfile = async (profileData) => {
     try {
-      const res = await fetch('/api/auth/profile', {
+      const res = await fetch(`${API_URL}/api/auth/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -257,14 +258,14 @@ export const AuthProvider = ({ children }) => {
   const incrementStreak = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/auth/streak', {
+      const res = await fetch(`${API_URL}/api/auth/streak`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
       if (data.success) {
         // Refresh local user state from DB
-        const meRes = await fetch('/api/auth/me', {
+        const meRes = await fetch(`${API_URL}/api/auth/me`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const meData = await meRes.json();

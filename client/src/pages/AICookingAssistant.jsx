@@ -5,6 +5,8 @@ import {
   Trash2, ChefHat, HelpCircle, ArrowDown 
 } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const AICookingAssistant = () => {
   const { token } = useAuth();
   
@@ -78,7 +80,7 @@ const AICookingAssistant = () => {
     try {
       const chatHistory = messages.map(m => ({ sender: m.sender, text: m.text }));
       
-      const res = await fetch('/api/ai/chat', {
+      const res = await fetch(`${API_URL}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text.trim(), chatHistory })

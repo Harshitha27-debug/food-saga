@@ -3,13 +3,15 @@ import { Link } from 'react-router-dom';
 import { ChefHat, Star, Heart, MessageCircle, Plus } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const Community = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch custom community recipes
-    fetch('/api/recipes?limit=9')
+    fetch(`${API_URL}/api/recipes?limit=9`)
       .then(res => res.json())
       .then(d => {
         if (d.success) {

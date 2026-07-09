@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const AIRecommendation = () => {
   const { token } = useAuth();
   
@@ -57,7 +59,7 @@ const AIRecommendation = () => {
     };
 
     try {
-      const res = await fetch('/api/ai/recommend', {
+      const res = await fetch(`${API_URL}/api/ai/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { Bookmark, Star, Trash2, ArrowRight } from 'lucide-react';
 import Loader from '../components/Loader';
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const Favorites = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ const Favorites = () => {
 
   const fetchFavorites = () => {
     setLoading(true);
-    fetch('/api/favorites', {
+    fetch(`${API_URL}/api/favorites`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -39,7 +41,7 @@ const Favorites = () => {
     e.stopPropagation();
 
     try {
-      const res = await fetch(`/api/favorites/${recipeId}`, {
+      const res = await fetch(`${API_URL}/api/favorites/${recipeId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

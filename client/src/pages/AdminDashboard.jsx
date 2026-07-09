@@ -16,6 +16,8 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, ArcElement);
 
+const API_URL = import.meta.env.VITE_API_URL || '';
+
 const AdminDashboard = () => {
   const { token, user } = useAuth();
   const navigate = useNavigate();
@@ -37,7 +39,7 @@ const AdminDashboard = () => {
 
   const fetchAnalytics = () => {
     setLoading(true);
-    fetch('/api/admin/analytics', {
+    fetch(`${API_URL}/api/admin/analytics`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -49,7 +51,7 @@ const AdminDashboard = () => {
   };
 
   const loadUsers = () => {
-    fetch('/api/admin/users', {
+    fetch(`${API_URL}/api/admin/users`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -57,7 +59,7 @@ const AdminDashboard = () => {
   };
 
   const loadRecipes = () => {
-    fetch('/api/recipes?limit=20')
+    fetch(`${API_URL}/api/recipes?limit=20`)
       .then(res => res.json())
       .then(d => { if (d.success) setRecipesList(d.data); });
   };
@@ -65,7 +67,7 @@ const AdminDashboard = () => {
   const handleToggleRole = async (userId, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     try {
-      const res = await fetch(`/api/admin/users/${userId}/role`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${userId}/role`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +87,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (userId) => {
     if (!window.confirm('Delete this user account?')) return;
     try {
-      const res = await fetch(`/api/admin/users/${userId}`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
